@@ -1,5 +1,4 @@
 const PAIRS = [
-
   {
     image: "images/messeage1.png",
     message: `心が疲れているときは、
@@ -43,7 +42,6 @@ const PAIRS = [
 今日も、自分の心と身体に
 少し優しい時間を。`
   },
-
   {
     image: "images/messeage2.png",
     message: `「できない理由」を探している間は、
@@ -63,7 +61,7 @@ const PAIRS = [
 
 そう問い直す。
 
-身体も、心も、人生も、
+身体も, 心も, 人生も、
 変化はいつだって
 小さな選択から始まる。
 
@@ -71,9 +69,8 @@ const PAIRS = [
 「できない」ではなく
 「どうしたらできる？」を選んでみよう。`
   },
-
   {
-    image:"images/messeage3.png",
+    image: "images/messeage3.png",
     message: `「自分の幸せは、
 自分でつくる。」
 
@@ -108,10 +105,9 @@ const PAIRS = [
 🌿 今日も、自分の心と身体の声を聞いて、
 自分が幸せになる選択をひとつ。`
   }
-]
+];
 
 function jpDate() {
-
   const p = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Tokyo",
     year: "numeric",
@@ -120,70 +116,56 @@ function jpDate() {
   }).formatToParts(new Date());
 
   const o = {};
-
   p.forEach(x => {
     if (x.type !== "literal") {
       o[x.type] = Number(x.value);
     }
   });
-
   return o;
 }
 
-
 function indexOfDay(d) {
-
   const s = `${d.year}-${d.month}-${d.day}`;
-
   let h = 0;
-
   for (const c of s) {
     h = ((h << 5) - h) + c.charCodeAt(0);
     h |= 0;
   }
-
   return Math.abs(h) % PAIRS.length;
 }
 
-
 function render() {
-
   const d = jpDate();
   const i = indexOfDay(d);
   const p = PAIRS[i];
 
-  document.querySelector("#date").textContent =
-    `${d.year}.${d.month}.${d.day}`;
+  // 日付の表示
+  const dateEl = document.querySelector("#date");
+  if (dateEl) dateEl.textContent = `${d.year}.${d.month}.${d.day}`;
 
-  const today = Date.UTC(
-    d.year,
-    d.month - 1,
-    d.day
-  );
+  // 今日の0時0分0秒から、12月31日23時59分59秒まで（今日込みで計算）
+  const start = new Date(d.year, d.month - 1, d.day, 0, 0, 0);
+  const target = new Date(2026, 11, 31, 23, 59, 59);
+  const diffDays = Math.ceil((target - start) / (1000 * 60 * 60 * 24));
 
-  const end = Date.UTC(
-    2026,
-    11,
-    31
-  );
+  // カウントダウン表示（今日9/20なら 103日）
+  const daysEl = document.getElementById("days");
+  if (daysEl) daysEl.textContent = Math.max(0, diffDays);
 
-  document.querySelector("#days").textContent =
-    Math.max(
-      0,
-      Math.ceil((end - today) / 86400000)
-    );
+  // 画像の表示
+  const photoEl = document.querySelector("#photo");
+  if (photoEl) {
+    photoEl.src = p.image;
+    photoEl.alt = `今日のイメージ ${i + 1}`;
+  }
 
-  document.querySelector("#photo").src = p.image;
+  // メッセージの表示
+  const msgEl = document.querySelector("#message") || document.querySelector(".message");
+  if (msgEl) msgEl.textContent = p.message;
 
-  document.querySelector("#photo").alt =
-    `今日のイメージ ${i + 1}`;
-
-  document.querySelector("#message").textContent =
-    p.message;
-
-  document.querySelector("#year").textContent =
-    d.year;
+  // 年号の表示
+  const yearEl = document.querySelector("#year");
+  if (yearEl) yearEl.textContent = d.year;
 }
-
 
 render();
